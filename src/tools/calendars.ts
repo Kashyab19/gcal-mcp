@@ -3,6 +3,12 @@ import type { calendar_v3 } from "googleapis"
 import type { Auth } from "googleapis"
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
 
+function checkAuthentication(oauth2Client: Auth.OAuth2Client) {
+	if (!oauth2Client.credentials.access_token && !oauth2Client.credentials.refresh_token) {
+		throw new Error("Authentication required. Please authenticate first using `generate_oauth_url` and `exchange_auth_code` tools.")
+	}
+}
+
 export function registerCalendarTools(
 	server: McpServer,
 	calendar: calendar_v3.Calendar,
@@ -21,17 +27,8 @@ export function registerCalendarTools(
 		},
 		async ({ show_hidden }) => {
 			try {
-				// Check if we have valid credentials
-				if (!oauth2Client.credentials.access_token && !oauth2Client.credentials.refresh_token) {
-					return {
-						content: [
-							{
-								type: "text",
-								text: "❌ **Authentication Required**: Please authenticate first using `generate_oauth_url` and `exchange_auth_code` tools.",
-							},
-						],
-					}
-				}
+				// Check authentication only when tool is invoked
+				checkAuthentication(oauth2Client)
 
 				const response = await calendar.calendarList.list({
 					showHidden: show_hidden,
@@ -99,16 +96,8 @@ export function registerCalendarTools(
 		},
 		async ({ calendar_id }) => {
 			try {
-				if (!oauth2Client.credentials.access_token && !oauth2Client.credentials.refresh_token) {
-					return {
-						content: [
-							{
-								type: "text",
-								text: "❌ **Authentication Required**: Please authenticate first using `generate_oauth_url` and `exchange_auth_code` tools.",
-							},
-						],
-					}
-				}
+				// Check authentication only when tool is invoked
+				checkAuthentication(oauth2Client)
 
 				const response = await calendar.calendars.get({
 					calendarId: calendar_id,
@@ -169,16 +158,8 @@ export function registerCalendarTools(
 		},
 		async ({ summary, description, location, timezone }) => {
 			try {
-				if (!oauth2Client.credentials.access_token && !oauth2Client.credentials.refresh_token) {
-					return {
-						content: [
-							{
-								type: "text",
-								text: "❌ **Authentication Required**: Please authenticate first using `generate_oauth_url` and `exchange_auth_code` tools.",
-							},
-						],
-					}
-				}
+				// Check authentication only when tool is invoked
+				checkAuthentication(oauth2Client)
 
 				const response = await calendar.calendars.insert({
 					requestBody: {
@@ -232,16 +213,8 @@ export function registerCalendarTools(
 		},
 		async ({ calendar_id }) => {
 			try {
-				if (!oauth2Client.credentials.access_token && !oauth2Client.credentials.refresh_token) {
-					return {
-						content: [
-							{
-								type: "text",
-								text: "❌ **Authentication Required**: Please authenticate first using `generate_oauth_url` and `exchange_auth_code` tools.",
-							},
-						],
-					}
-				}
+				// Check authentication only when tool is invoked
+				checkAuthentication(oauth2Client)
 
 				if (calendar_id === "primary") {
 					return {

@@ -3,6 +3,12 @@ import type { calendar_v3 } from "googleapis"
 import type { Auth } from "googleapis"
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
 
+function checkAuthentication(oauth2Client: Auth.OAuth2Client) {
+	if (!oauth2Client.credentials.access_token && !oauth2Client.credentials.refresh_token) {
+		throw new Error("Authentication required. Please authenticate first using `generate_oauth_url` and `exchange_auth_code` tools.")
+	}
+}
+
 export function registerEventTools(
 	server: McpServer,
 	calendar: calendar_v3.Calendar,
@@ -47,16 +53,8 @@ export function registerEventTools(
 		},
 		async ({ calendar_id, time_min, time_max, max_results, single_events, order_by, q }) => {
 			try {
-				if (!oauth2Client.credentials.access_token && !oauth2Client.credentials.refresh_token) {
-					return {
-						content: [
-							{
-								type: "text",
-								text: "❌ **Authentication Required**: Please authenticate first using `generate_oauth_url` and `exchange_auth_code` tools.",
-							},
-						],
-					}
-				}
+				// Check authentication only when tool is invoked
+				checkAuthentication(oauth2Client)
 
 				const response = await calendar.events.list({
 					calendarId: calendar_id,
@@ -165,16 +163,8 @@ export function registerEventTools(
 		},
 		async ({ calendar_id, event_id }) => {
 			try {
-				if (!oauth2Client.credentials.access_token && !oauth2Client.credentials.refresh_token) {
-					return {
-						content: [
-							{
-								type: "text",
-								text: "❌ **Authentication Required**: Please authenticate first using `generate_oauth_url` and `exchange_auth_code` tools.",
-							},
-						],
-					}
-				}
+				// Check authentication only when tool is invoked
+				checkAuthentication(oauth2Client)
 
 				const response = await calendar.events.get({
 					calendarId: calendar_id,
@@ -322,16 +312,8 @@ export function registerEventTools(
 		},
 		async ({ calendar_id, summary, description, start_time, end_time, location, attendees, timezone, all_day }) => {
 			try {
-				if (!oauth2Client.credentials.access_token && !oauth2Client.credentials.refresh_token) {
-					return {
-						content: [
-							{
-								type: "text",
-								text: "❌ **Authentication Required**: Please authenticate first using `generate_oauth_url` and `exchange_auth_code` tools.",
-							},
-						],
-					}
-				}
+				// Check authentication only when tool is invoked
+				checkAuthentication(oauth2Client)
 
 				const eventBody: calendar_v3.Schema$Event = {
 					summary,
@@ -443,16 +425,8 @@ ${attendees.map(email => `- ${email}`).join('\n')}` : ""}
 		},
 		async ({ calendar_id, event_id, summary, description, start_time, end_time, location, status }) => {
 			try {
-				if (!oauth2Client.credentials.access_token && !oauth2Client.credentials.refresh_token) {
-					return {
-						content: [
-							{
-								type: "text",
-								text: "❌ **Authentication Required**: Please authenticate first using `generate_oauth_url` and `exchange_auth_code` tools.",
-							},
-						],
-					}
-				}
+				// Check authentication only when tool is invoked
+				checkAuthentication(oauth2Client)
 
 				// First get the existing event
 				const existingEvent = await calendar.events.get({
@@ -531,16 +505,8 @@ ${updatedEvent.description ? `- **Description:** ${updatedEvent.description}` : 
 		},
 		async ({ calendar_id, event_id }) => {
 			try {
-				if (!oauth2Client.credentials.access_token && !oauth2Client.credentials.refresh_token) {
-					return {
-						content: [
-							{
-								type: "text",
-								text: "❌ **Authentication Required**: Please authenticate first using `generate_oauth_url` and `exchange_auth_code` tools.",
-							},
-						],
-					}
-				}
+				// Check authentication only when tool is invoked
+				checkAuthentication(oauth2Client)
 
 				// Get event details before deletion for confirmation
 				const eventDetails = await calendar.events.get({
