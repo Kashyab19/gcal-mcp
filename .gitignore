@@ -7,6 +7,7 @@ yarn.lock
 # Build output
 dist/
 build/
+.smithery/
 
 # Environment variables
 .env
