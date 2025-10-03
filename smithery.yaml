@@ -4,19 +4,19 @@ configSchema:
   properties:
     clientId:
       type: "string"
-      description: "Google OAuth2 Client ID from Google Cloud Console (APIs & Services > Credentials)"
+      description: "Google OAuth2 Client ID from Google Cloud Console (APIs & Services > Credentials). Not needed when OAuth 2.1 is enabled."
     clientSecret:
       type: "string"
-      description: "Google OAuth2 Client Secret from Google Cloud Console"
+      description: "Google OAuth2 Client Secret from Google Cloud Console. Not needed when OAuth 2.1 is enabled."
     redirectUri:
       type: "string"
-      default: "http://localhost:3000/oauth2callback"
+      default: "http://localhost:8081/oauth2callback"
       description: "OAuth2 redirect URI (must match the one configured in Google Cloud Console)"
     refreshToken:
       type: "string"
       description: "Optional: Pre-existing refresh token for accessing user's calendar data"
-  required: ["clientId", "clientSecret"]
+  required: []
 exampleConfig:
   clientId: "123456789012-abcdefghijklmnopqrstuvwxyz012345.apps.googleusercontent.com"
   clientSecret: "GOCSPX-abcdefghijklmnopqrstuvwxyz012345"
-  redirectUri: "http://localhost:3000/oauth2callback" 
+  redirectUri: "http://localhost:8081/oauth2callback"
