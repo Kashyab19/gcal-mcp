@@ -12,37 +12,37 @@ const isOAuth21Enabled = process.env.OAUTH21_ENABLED === 'true'
 
 export const configSchema = isOAuth21Enabled
 	? z.object({
-			clientId: z
-				.string()
-				.optional()
-				.describe('Google OAuth2 Client ID (not needed with OAuth 2.1)'),
-			clientSecret: z
-				.string()
-				.optional()
-				.describe('Google OAuth2 Client Secret (not needed with OAuth 2.1)'),
-			redirectUri: z
-				.string()
-				.optional()
-				.describe('OAuth2 redirect URI (not needed with OAuth 2.1)'),
-			refreshToken: z.string().optional().describe('Optional: Pre-existing refresh token'),
-		})
+		clientId: z
+			.string()
+			.optional()
+			.describe('Google OAuth2 Client ID (not needed with OAuth 2.1)'),
+		clientSecret: z
+			.string()
+			.optional()
+			.describe('Google OAuth2 Client Secret (not needed with OAuth 2.1)'),
+		redirectUri: z
+			.string()
+			.optional()
+			.describe('OAuth2 redirect URI (not needed with OAuth 2.1)'),
+		refreshToken: z.string().optional().describe('Optional: Pre-existing refresh token'),
+	})
 	: z.object({
-			clientId: z.string().describe('Google OAuth2 Client ID from Google Cloud Console'),
-			clientSecret: z.string().describe('Google OAuth2 Client Secret from Google Cloud Console'),
-			redirectUri: z
-				.string()
-				.default('http://localhost:8082/oauth2callback')
-				.describe('OAuth2 redirect URI'),
-			refreshToken: z.string().optional().describe('Optional: Pre-existing refresh token'),
-		})
+		clientId: z.string().describe('Google OAuth2 Client ID from Google Cloud Console'),
+		clientSecret: z.string().describe('Google OAuth2 Client Secret from Google Cloud Console'),
+		redirectUri: z
+			.string()
+			.default('http://localhost:8082/oauth2callback')
+			.describe('OAuth2 redirect URI'),
+		refreshToken: z.string().optional().describe('Optional: Pre-existing refresh token'),
+	})
 
 // OAuth 2.1 Integration
 const oauth21Config = isOAuth21Enabled
 	? {
-			authServerUrl: process.env.OAUTH21_AUTH_SERVER_URL || OAUTH21_CONFIG.DEFAULT_AUTH_SERVER_URL,
-			resourceId: process.env.OAUTH21_RESOURCE_ID || OAUTH21_CONFIG.DEFAULT_RESOURCE_ID,
-			autoAuth: process.env.OAUTH21_AUTO_AUTH === 'true',
-		}
+		authServerUrl: process.env.OAUTH21_AUTH_SERVER_URL || OAUTH21_CONFIG.DEFAULT_AUTH_SERVER_URL,
+		resourceId: process.env.OAUTH21_RESOURCE_ID || OAUTH21_CONFIG.DEFAULT_RESOURCE_ID,
+		autoAuth: process.env.OAUTH21_AUTO_AUTH === 'true',
+	}
 	: null
 
 export default function ({ config }: { config: z.infer<typeof configSchema> }) {
@@ -96,10 +96,18 @@ export default function ({ config }: { config: z.infer<typeof configSchema> }) {
 		// Initialize Google Calendar API client
 		const calendar = google.calendar({ version: 'v3', auth: oauth2Client })
 
-		// Register tool groups
+		// Register tools
+		console.log('Registering tools...')
 		registerAuthTools(server, oauth2Client)
+		console.log('   Auth tools registered')
+
 		registerCalendarTools(server, calendar, oauth2Client)
+		console.log('   Calendar tools registered')
+
 		registerEventTools(server, calendar, oauth2Client)
+		console.log('   Event tools registered')
+
+		console.log('MCP Server ready!')
 
 		return server.server
 	} catch (e) {

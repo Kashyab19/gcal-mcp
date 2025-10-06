@@ -12,6 +12,7 @@ export function registerEventTools(
 ) {
 	// Helper function to get a fresh calendar instance with current credentials
 	const getCalendar = () => createCalendarClient(oauth2Client)
+
 	// Tool: Get Current Time
 	server.tool(
 		TOOL_NAMES.EVENTS.GET_CURRENT_TIME,
@@ -94,7 +95,11 @@ ${
 - **Description:** ${event.description || 'No description'}
 - **Status:** ${event.status || 'Unknown'}
 - **HTML Link:** ${event.htmlLink || 'Not available'}
-${event.attendees ? `- **Attendees:** ${event.attendees.map((a) => a.email || a.displayName || 'Unknown').join(', ')}` : ''}
+${
+	event.attendees
+		? `- **Attendees:** ${event.attendees.map((a) => a.email || a.displayName || 'Unknown').join(', ')}`
+		: ''
+}
 `
 				)
 				.join('\n')
@@ -105,9 +110,10 @@ ${event.attendees ? `- **Attendees:** ${event.attendees.map((a) => a.email || a.
 				return {
 					content: [{ type: 'text', text: markdown }],
 				}
-			} catch (e: any) {
+			} catch (e: unknown) {
+				const errorMessage = e instanceof Error ? e.message : 'Unknown error occurred'
 				return {
-					content: [{ type: 'text', text: `Error listing events: ${e.message}` }],
+					content: [{ type: 'text', text: `Error listing events: ${errorMessage}` }],
 				}
 			}
 		}
@@ -174,9 +180,10 @@ ${
 				return {
 					content: [{ type: 'text', text: markdown }],
 				}
-			} catch (e: any) {
+			} catch (e: unknown) {
+				const errorMessage = e instanceof Error ? e.message : 'Unknown error occurred'
 				return {
-					content: [{ type: 'text', text: `Error getting event details: ${e.message}` }],
+					content: [{ type: 'text', text: `Error getting event details: ${errorMessage}` }],
 				}
 			}
 		}
@@ -214,7 +221,7 @@ ${
 				const startTime = new Date(now.getTime() + start_offset_minutes * 60 * 1000)
 				const endTime = new Date(startTime.getTime() + duration_minutes * 60 * 1000)
 
-				const eventData: any = {
+				const eventData: calendar_v3.Schema$Event = {
 					summary,
 					description,
 					location,
@@ -258,9 +265,10 @@ ${
 				return {
 					content: [{ type: 'text', text: markdown }],
 				}
-			} catch (e: any) {
+			} catch (e: unknown) {
+				const errorMessage = e instanceof Error ? e.message : 'Unknown error occurred'
 				return {
-					content: [{ type: 'text', text: `Error creating event: ${e.message}` }],
+					content: [{ type: 'text', text: `Error creating event: ${errorMessage}` }],
 				}
 			}
 		}
@@ -291,7 +299,7 @@ ${
 			all_day,
 		}) => {
 			try {
-				const eventData: any = {
+				const eventData: calendar_v3.Schema$Event = {
 					summary,
 					description,
 					location,
@@ -335,9 +343,10 @@ ${
 				return {
 					content: [{ type: 'text', text: markdown }],
 				}
-			} catch (e: any) {
+			} catch (e: unknown) {
+				const errorMessage = e instanceof Error ? e.message : 'Unknown error occurred'
 				return {
-					content: [{ type: 'text', text: `Error creating event: ${e.message}` }],
+					content: [{ type: 'text', text: `Error creating event: ${errorMessage}` }],
 				}
 			}
 		}
@@ -421,9 +430,10 @@ ${
 				return {
 					content: [{ type: 'text', text: markdown }],
 				}
-			} catch (e: any) {
+			} catch (e: unknown) {
+				const errorMessage = e instanceof Error ? e.message : 'Unknown error occurred'
 				return {
-					content: [{ type: 'text', text: `Error updating event: ${e.message}` }],
+					content: [{ type: 'text', text: `Error updating event: ${errorMessage}` }],
 				}
 			}
 		}
@@ -506,9 +516,10 @@ To get more details about a specific event, use the \`get_event\` tool with the 
 				return {
 					content: [{ type: 'text', text: markdown }],
 				}
-			} catch (e: any) {
+			} catch (e: unknown) {
+				const errorMessage = e instanceof Error ? e.message : 'Unknown error occurred'
 				return {
-					content: [{ type: 'text', text: `Error searching for events: ${e.message}` }],
+					content: [{ type: 'text', text: `Error searching for events: ${errorMessage}` }],
 				}
 			}
 		}
@@ -591,7 +602,9 @@ To get more details about a specific event, use the \`get_event\` tool with the 
 
 No events found matching your criteria:
 - **Name:** "${event_name}"
-${start_date ? `- **Date:** ${start_date}\n` : ''}${start_time ? `- **Time:** ${start_time}\n` : ''}${location ? `- **Location:** ${location}\n` : ''}
+${start_date ? `- **Date:** ${start_date}\n` : ''}${start_time ? `- **Time:** ${start_time}\n` : ''}${
+	location ? `- **Location:** ${location}\n` : ''
+}
 
 ## Suggestions:
 1. Try using a partial name match
@@ -643,24 +656,13 @@ start_time: "14:30"
 				// Exactly one match or force_delete is true
 				const eventToDelete = matchingEvents[0]
 
-				// Show what we're about to delete
-				const _confirmationMarkdown = `# Confirming Event Deletion
-
-## Event to be deleted:
-- **Title:** ${eventToDelete.summary || 'Untitled Event'}
-- **Start:** ${eventToDelete.start?.dateTime || eventToDelete.start?.date || 'Not specified'}
-- **End:** ${eventToDelete.end?.dateTime || eventToDelete.end?.date || 'Not specified'}
-- **Location:** ${eventToDelete.location || 'Not specified'}
-- **Description:** ${eventToDelete.description || 'No description'}
-
-**WARNING: This action cannot be undone!**
-
-Proceeding with deletion...`
-
 				// Delete the event
+				if (!eventToDelete.id) {
+					throw new Error('Event ID is missing')
+				}
 				await currentCalendar.events.delete({
 					calendarId: calendar_id,
-					eventId: eventToDelete.id!,
+					eventId: eventToDelete.id,
 				})
 
 				const markdown = `# Event Deleted Successfully
@@ -681,14 +683,15 @@ Proceeding with deletion...`
 				return {
 					content: [{ type: 'text', text: markdown }],
 				}
-			} catch (e: any) {
+			} catch (e: unknown) {
+				const errorMessage = e instanceof Error ? e.message : 'Unknown error occurred'
 				return {
 					content: [
 						{
 							type: 'text',
 							text: `# Error Deleting Event
 
-**Error:** ${e.message}
+**Error:** ${errorMessage}
 
 ## Troubleshooting:
 1. Make sure the event name is spelled correctly
@@ -742,14 +745,15 @@ Proceeding with deletion...`
 				return {
 					content: [{ type: 'text', text: markdown }],
 				}
-			} catch (e: any) {
+			} catch (e: unknown) {
+				const errorMessage = e instanceof Error ? e.message : 'Unknown error occurred'
 				return {
 					content: [
 						{
 							type: 'text',
 							text: `# Error Deleting Event
 
-**Error:** ${e.message}
+**Error:** ${errorMessage}
 
 ## Troubleshooting:
 - Make sure the event ID is correct
@@ -813,7 +817,9 @@ Proceeding with deletion...`
 						content: [
 							{
 								type: 'text',
-								text: `No events found matching the criteria:\n- Name: "${event_name}"\n${start_date ? `- Start Date: ${start_date}\n` : ''}${location ? `- Location: ${location}\n` : ''}\n\nTry using \`find_events_by_name\` to search for similar events.`,
+								text: `No events found matching the criteria:\n- Name: "${event_name}"\n${
+									start_date ? `- Start Date: ${start_date}\n` : ''
+								}${location ? `- Location: ${location}\n` : ''}\n\nTry using \`find_events_by_name\` to search for similar events.`,
 							},
 						],
 					}
@@ -848,9 +854,12 @@ ${matchingEvents
 				// Exactly one match - proceed with deletion
 				const eventToDelete = matchingEvents[0]
 
+				if (!eventToDelete.id) {
+					throw new Error('Event ID is missing')
+				}
 				await currentCalendar.events.delete({
 					calendarId: calendar_id,
-					eventId: eventToDelete.id!,
+					eventId: eventToDelete.id,
 				})
 
 				const markdown = `# Event Deleted Successfully
@@ -867,9 +876,10 @@ ${matchingEvents
 				return {
 					content: [{ type: 'text', text: markdown }],
 				}
-			} catch (e: any) {
+			} catch (e: unknown) {
+				const errorMessage = e instanceof Error ? e.message : 'Unknown error occurred'
 				return {
-					content: [{ type: 'text', text: `Error deleting event: ${e.message}` }],
+					content: [{ type: 'text', text: `Error deleting event: ${errorMessage}` }],
 				}
 			}
 		}

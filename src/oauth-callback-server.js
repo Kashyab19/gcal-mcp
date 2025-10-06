@@ -79,14 +79,14 @@ const server = http.createServer((req, res) => {
 })
 
 server.listen(PORT, 'localhost', () => {
-	console.log(`🚀 OAuth callback server running on http://localhost:${PORT}`)
-	console.log(`📡 Waiting for OAuth callback at: http://localhost:${PORT}/oauth2callback`)
-	console.log('\n💡 To test the OAuth flow:')
+	console.log(`OAuth callback server running on http://localhost:${PORT}`)
+	console.log(`Waiting for OAuth callback at: http://localhost:${PORT}/oauth2callback`)
+	console.log('\nTo test the OAuth flow:')
 	console.log('1. Use the generate_oauth_url tool in your MCP client')
 	console.log('2. Visit the generated URL in your browser')
 	console.log('3. Authorize the application')
 	console.log('4. The callback server will capture the code automatically')
-	console.log('\n⏳ Server is ready and waiting...')
+	console.log('\nServer is ready and waiting...')
 })
 
 server.on('error', (err) => {

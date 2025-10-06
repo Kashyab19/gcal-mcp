@@ -21,7 +21,7 @@ This implementation provides a complete OAuth 2.1 compliant authentication syste
                   └──────────────────┘
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Prerequisites
 
@@ -99,7 +99,7 @@ npm run dev
 # Demonstrates the complete flow
 ```
 
-## 🔐 Security Features
+## Security Features
 
 ### OAuth 2.1 Compliance
 - **PKCE (S256)** mandatory for all authorization flows
@@ -157,7 +157,7 @@ npm run dev
 - **`calendar.events.read`** - Required for reading events
 - **`calendar.events.write`** - Required for creating/updating/deleting events
 
-## 🔄 Authentication Flow
+## Authentication Flow
 
 ### 1. Client Registration
 ```typescript
@@ -289,7 +289,7 @@ MCP_RESOURCE_ID=http://localhost:3002
 - **Geographic access monitoring**
 - **Failed authorization attempts**
 
-## 🔄 Token Refresh Flow
+## Token Refresh Flow
 
 ```typescript
 // Automatic token refresh
@@ -303,7 +303,7 @@ async function getValidToken() {
 }
 ```
 
-## 📊 Error Handling
+## Error Handling
 
 ### Common Error Responses
 ```json

@@ -177,16 +177,16 @@ export function registerAuthTools(server: McpServer, oauth2Client: Auth.OAuth2Cl
 							content: [
 								{
 									type: 'text',
-									text: `# ✅ OAuth 2.1 Authentication Successful!
+									text: `# OAuth 2.1 Authentication Successful!
 
 **Authentication Complete!** You are now authenticated with Google Calendar.
 
-## 🔑 Token Information
-- **Access Token**: ✅ Present
-- **Refresh Token**: ✅ Present  
+## Token Information
+- **Access Token**: Present
+- **Refresh Token**: Present  
 - **Expires In**: ${(tokens as any).expires_in || 'Unknown'} seconds
 
-## 🛠️ Available Tools
+## Available Tools
 - \`list_calendars\` - List your calendars
 - \`list_events\` - List calendar events
 - \`create_event\` - Create new events
@@ -195,7 +195,7 @@ export function registerAuthTools(server: McpServer, oauth2Client: Auth.OAuth2Cl
 - \`delete_event\` - Delete events by name/details
 - \`get_current_time\` - Get current system time
 
-**🎉 You're ready to use Google Calendar!**`,
+**You're ready to use Google Calendar!**`,
 								},
 							],
 						}
@@ -416,7 +416,6 @@ async function generateCodeChallenge(verifier: string): Promise<string> {
 function generateRandomString(): string {
 	return crypto.randomBytes(16).toString('hex')
 }
-
 async function startCallbackServer(): Promise<any> {
 	const express = await import('express')
 	const app = express.default()
@@ -545,7 +544,7 @@ async function waitForCallback(server: any, expectedState: string): Promise<stri
 						</head>
 						<body>
 							<div class="container">
-								<div class="icon">🔒</div>
+								<div class="icon">LOCK</div>
 								<h1>OAuth Error</h1>
 								<p>There was an issue with the OAuth authentication process.</p>
 								<div class="error-detail">Error: ${error}</div>
@@ -640,7 +639,7 @@ async function waitForCallback(server: any, expectedState: string): Promise<stri
 								}
 								
 								.status::before {
-									content: '✗';
+									content: 'X';
 									margin-right: 8px;
 									font-weight: bold;
 								}
@@ -663,7 +662,7 @@ async function waitForCallback(server: any, expectedState: string): Promise<stri
 						</head>
 						<body>
 							<div class="container">
-								<div class="icon">⚠️</div>
+								<div class="icon">WARNING</div>
 								<h1>Authentication Failed</h1>
 								<div class="status">Invalid authorization</div>
 								<p>There was an issue with the authentication process. This may be due to an invalid state or missing authorization code.</p>
@@ -760,7 +759,7 @@ async function waitForCallback(server: any, expectedState: string): Promise<stri
 							}
 							
 							.status::before {
-								content: '✓';
+									content: 'OK';
 								margin-right: 8px;
 								font-weight: bold;
 							}
@@ -795,7 +794,7 @@ async function waitForCallback(server: any, expectedState: string): Promise<stri
 					</head>
 					<body>
 						<div class="container">
-							<div class="icon">🔐</div>
+							<div class="icon">SUCCESS</div>
 							<h1>Authentication Successful!</h1>
 							<div class="status">Connected to Google Calendar</div>
 							<p>Your Google Calendar MCP server is now authenticated and ready to use. You can close this window and return to your application.</p>
