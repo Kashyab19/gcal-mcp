@@ -4,12 +4,13 @@ A Model Context Protocol (MCP) server for interacting with Google Calendar API, 
 
 ## Features
 
-- **OAuth2 Authentication**: Complete OAuth2 flow for secure Google Calendar access
+- **OAuth 2.1 Authentication**: Modern, secure authentication with automatic browser opening
 - **Calendar Management**: List, create, and delete calendars
 - **Event Operations**: Create, read, update, and delete calendar events
 - **Comprehensive Event Details**: Support for attendees, reminders, locations, and more
 - **All-Day Event Support**: Handle both timed and all-day events
 - **Search Functionality**: Search events by text and time ranges
+- **Server Monitoring**: Built-in server status and metrics
 
 ## Prerequisites
 
@@ -48,7 +49,7 @@ Before using this MCP server, you need:
 2. Click "Create Credentials" > "OAuth 2.0 Client IDs"
 3. Choose "Web application"
 4. Add authorized redirect URIs:
-   - `http://localhost:3000/oauth2callback`
+   - `http://localhost:3080/oauth/google/callback`
 5. Download the JSON file and note your Client ID and Client Secret
 
 ## Installation
@@ -70,56 +71,72 @@ npm install
 
 ## Configuration
 
-Configure the MCP server with your Google OAuth2 credentials:
+Configure the MCP server using environment variables. Create a `.env` file:
 
-```json
-{
-  "clientId": "your-google-client-id.apps.googleusercontent.com",
-  "clientSecret": "your-google-client-secret",
-  "redirectUri": "http://localhost:3000/oauth2callback",
-  "refreshToken": "optional-refresh-token-for-permanent-access"
-}
+```env
+# Google OAuth Configuration (Required for OAuth 2.1)
+GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+
+# Pre-existing Refresh Token (Optional - for automatic authentication)
+GOOGLE_REFRESH_TOKEN=your-refresh-token-here
+
+# OAuth 2.1 Configuration (Required)
+OAUTH21_ENABLED=true
+OAUTH21_AUTH_SERVER_URL=http://localhost:3080
+OAUTH21_RESOURCE_ID=http://localhost:8081
+OAUTH21_AUTO_AUTH=true
+
+# Development Settings
+NODE_ENV=development
+MCP_SERVER_PORT=8081
+MCP_SERVER_HOST=localhost
 ```
 
 ### Configuration Parameters
 
-- **`clientId`** (required): Google OAuth2 Client ID from Google Cloud Console
-- **`clientSecret`** (required): Google OAuth2 Client Secret from Google Cloud Console  
-- **`redirectUri`** (optional): OAuth2 redirect URI (default: `http://localhost:3000/oauth2callback`)
-- **`refreshToken`** (optional): Pre-existing refresh token for permanent access
+- **`GOOGLE_CLIENT_ID`** (required): Google OAuth2 Client ID from Google Cloud Console
+- **`GOOGLE_CLIENT_SECRET`** (required): Google OAuth2 Client Secret from Google Cloud Console  
+- **`GOOGLE_REFRESH_TOKEN`** (optional): Pre-existing refresh token for automatic authentication
+- **`OAUTH21_AUTH_SERVER_URL`** (required): OAuth 2.1 authorization server URL
+- **`OAUTH21_RESOURCE_ID`** (required): MCP server resource identifier
 
 ## Usage
 
 ### Development
 
-```bash
-npx @smithery/cli dev
-```
+1. **Start the Auth Server** (in one terminal):
+   ```bash
+   cd auth-server
+   npm run dev
+   ```
+
+2. **Start the MCP Server** (in another terminal):
+   ```bash
+   npm run dev
+   ```
 
 ### Authentication Flow
 
-1. **Generate OAuth URL**:
+The server uses **OAuth 2.1** with automatic authentication:
+
+1. **Run the authenticate tool**:
    ```
-   Tool: generate_oauth_url
+   Tool: authenticate
    ```
 
-2. **Visit the URL** and authorize the application
+2. **Browser opens automatically** - Complete Google's consent screen
 
-3. **Exchange Authorization Code**:
-   ```
-   Tool: exchange_auth_code
-   Parameters: { "auth_code": "code-from-redirect" }
-   ```
+3. **Authentication complete** - Tokens are automatically exchanged and stored
 
-4. **Save the refresh token** for future use in your configuration
+4. **Ready to use** - All calendar tools are now available
 
 ### Available Tools
 
 #### Authentication Tools
 
-- **`generate_oauth_url`** - Generate OAuth2 authorization URL
-- **`exchange_auth_code`** - Exchange authorization code for tokens  
-- **`check_auth_status`** - Check current authentication status
+- **`authenticate`** - OAuth 2.1 automatic authentication with browser opening
+- **`check_auth_status`** - Check current authentication status and token information
 
 #### Calendar Management
 
@@ -133,8 +150,14 @@ npx @smithery/cli dev
 - **`list_events`** - List events with filtering options
 - **`get_event`** - Get detailed event information
 - **`create_event`** - Create a new event
+- **`create_event_now`** - Create events starting now
 - **`update_event`** - Update an existing event
 - **`delete_event`** - Delete an event
+- **`get_current_time`** - Get current system time
+
+#### Monitoring
+
+- **`get_server_status`** - Get server metrics (uptime, memory usage, tool count)
 
 ### Example Usage
 
@@ -169,9 +192,10 @@ Parameters: {
 ## Security Best Practices
 
 1. **Store credentials securely** - Never commit OAuth2 credentials to version control
-2. **Use refresh tokens** - Configure `access_type: "offline"` to get refresh tokens
+2. **Use refresh tokens** - Save refresh tokens in your `.env` file for automatic authentication
 3. **Limit scopes** - Only request necessary Calendar API scopes
 4. **Monitor usage** - Keep track of API usage in Google Cloud Console
+5. **OAuth 2.1 compliance** - Uses PKCE and modern security standards
 
 ## Error Handling
 
