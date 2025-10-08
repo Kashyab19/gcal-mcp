@@ -141,18 +141,13 @@ The server uses **OAuth 2.1** with automatic authentication:
 #### Calendar Management
 
 - **`list_calendars`** - List all accessible calendars
-- **`get_calendar`** - Get detailed calendar information
-- **`create_calendar`** - Create a new calendar
-- **`delete_calendar`** - Delete a calendar (except primary)
+- **`manage_calendars`** - Create, get details, update, or delete calendars
 
 #### Event Management
 
-- **`list_events`** - List events with filtering options
-- **`get_event`** - Get detailed event information
-- **`create_event`** - Create a new event
-- **`create_event_now`** - Create events starting now
-- **`update_event`** - Update an existing event
-- **`delete_event`** - Delete an event
+- **`list_events`** - List events with filtering and search options
+- **`create_events`** - Create single, multiple, or recurring events
+- **`update_events`** - Update or delete events by ID, name, or search criteria
 - **`get_current_time`** - Get current system time
 
 #### Monitoring
@@ -161,10 +156,55 @@ The server uses **OAuth 2.1** with automatic authentication:
 
 ### Example Usage
 
+#### Create a Calendar
+
+```typescript
+Tool: manage_calendars
+Parameters: {
+  "create": true,
+  "summary": "Work Projects",
+  "description": "Calendar for work-related projects and deadlines",
+  "time_zone": "America/New_York"
+}
+```
+
+#### Get Calendar Details
+
+```typescript
+Tool: manage_calendars
+Parameters: {
+  "calendar_id": "primary"
+}
+```
+
+#### Update a Calendar
+
+```typescript
+Tool: manage_calendars
+Parameters: {
+  "calendar_id": "abc123def456",
+  "update": true,
+  "updates": {
+    "summary": "Updated Calendar Name",
+    "description": "New description"
+  }
+}
+```
+
+#### Delete a Calendar
+
+```typescript
+Tool: manage_calendars
+Parameters: {
+  "calendar_id": "abc123def456",
+  "delete": true
+}
+```
+
 #### Create an Event
 
 ```typescript
-Tool: create_event
+Tool: create_events
 Parameters: {
   "calendar_id": "primary",
   "summary": "Team Meeting", 
@@ -172,8 +212,31 @@ Parameters: {
   "start_time": "2024-01-15T10:00:00Z",
   "end_time": "2024-01-15T11:00:00Z",
   "location": "Conference Room A",
-  "attendees": ["colleague@company.com"],
-  "timezone": "America/New_York"
+  "attendees": ["colleague@company.com"]
+}
+```
+
+#### Create a Recurring Event
+
+```typescript
+Tool: create_events
+Parameters: {
+  "summary": "Weekly Team Standup",
+  "start_time": "2024-01-15T09:00:00Z",
+  "end_time": "2024-01-15T09:30:00Z",
+  "recurrence": ["FREQ=WEEKLY;BYDAY=MO,WE,FR"]
+}
+```
+
+#### Create an Event Starting Now
+
+```typescript
+Tool: create_events
+Parameters: {
+  "summary": "Quick Meeting",
+  "start_offset_minutes": 0,
+  "duration_minutes": 30,
+  "attendees": ["colleague@company.com"]
 }
 ```
 
@@ -186,6 +249,40 @@ Parameters: {
   "time_min": "2024-01-15T00:00:00Z",
   "time_max": "2024-01-22T23:59:59Z",
   "max_results": 20
+}
+```
+
+#### Search Events by Name
+
+```typescript
+Tool: list_events
+Parameters: {
+  "search_text": "team meeting",
+  "max_results": 10
+}
+```
+
+#### Update an Event
+
+```typescript
+Tool: update_events
+Parameters: {
+  "event_id": "abc123def456",
+  "updates": {
+    "summary": "Updated Meeting Title",
+    "location": "New Conference Room"
+  }
+}
+```
+
+#### Delete an Event by Name
+
+```typescript
+Tool: update_events
+Parameters: {
+  "event_name": "Old Meeting",
+  "start_date": "2024-01-15",
+  "delete": true
 }
 ```
 

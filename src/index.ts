@@ -4,8 +4,8 @@ import { google } from 'googleapis'
 import { z } from 'zod'
 import { ERROR_MESSAGES, OAUTH21_CONFIG, SERVER_CONFIG } from './constants.js'
 import { registerAuthTools } from './tools/auth.js'
-import { registerCalendarTools } from './tools/calendars.js'
-import { registerEventTools } from './tools/events.js'
+import { registerConsolidatedCalendarTools } from './tools/calendars-consolidated.js'
+import { registerConsolidatedEventTools } from './tools/events-consolidated.js'
 
 // Check if OAuth 2.1 is enabled at build time
 const isOAuth21Enabled = process.env.OAUTH21_ENABLED === 'true'
@@ -101,10 +101,10 @@ export default function ({ config }: { config: z.infer<typeof configSchema> }) {
 		registerAuthTools(server, oauth2Client)
 		console.log('   Auth tools registered')
 
-		registerCalendarTools(server, calendar, oauth2Client)
+		registerConsolidatedCalendarTools(server, calendar, oauth2Client)
 		console.log('   Calendar tools registered')
 
-		registerEventTools(server, calendar, oauth2Client)
+		registerConsolidatedEventTools(server, calendar, oauth2Client)
 		console.log('   Event tools registered')
 
 		console.log('MCP Server ready!')

@@ -131,21 +131,13 @@ export const TOOL_NAMES = {
 	},
 	CALENDARS: {
 		LIST: 'list_calendars',
-		GET_DETAILS: 'get_calendar_details',
-		CREATE: 'create_calendar',
-		DELETE: 'delete_calendar',
+		MANAGE: 'manage_calendars',
 	},
 	EVENTS: {
 		GET_CURRENT_TIME: 'get_current_time',
 		LIST: 'list_events',
-		GET_DETAILS: 'get_event',
-		CREATE: 'create_event',
-		CREATE_NOW: 'create_event_now',
-		UPDATE: 'update_event',
-		DELETE: 'delete_event',
-		DELETE_BY_ID: 'delete_event_by_id',
-		DELETE_BY_NAME: 'delete_event_by_name',
-		FIND_BY_NAME: 'find_events_by_name',
+		CREATE: 'create_events',
+		UPDATE: 'update_events',
 	},
 } as const
 
